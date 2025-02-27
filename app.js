@@ -1,26 +1,26 @@
 const env = require("dotenv").config();
 const express = require('express');
 const app = express();
+const path = require('path');
+const bodyParser = require("body-parser");
 const {connectDatabse} = require('./db');
-const UserModel = require("./models/User.model");
 
-// Basic route setup 
-app.get('/',(req,res)=> {
-    res.json({
-        'message' : "working",
-        'status' : 200
-    })
-})
+// basic middleware 
+app.use(bodyParser.urlencoded({extended : true}));
+app.use(bodyParser.json());
+app.use('/uploads',express.static(path.join(__dirname, "uploads")))
+
+// Routes handler 
+const userRoutes = require("./Routes/User.route.js")
+
+//Routes 
+app.use('/v1/users', userRoutes);
+
 
 
 // database connecting and starting sever 
 const PORT = process.env.PORT || 3001
-
 const startApp = ()=>{
-    connectDatabse()
-    app.listen(PORT,()=> {
-        console.log(`app is listning at ${PORT}`);
-        
-    })
-}
+    connectDatabse().then(()=> app.listen(PORT,()=> console.log(`Server is listining at ${PORT}`))
+)}
 startApp()

@@ -8,37 +8,39 @@ const userSchema = new mongoose.Schema({
   },
   email: {
     type: String,
-    required: [true, "Email is reuqired!"],
-    unique: [true, "Email already exist! use a diffent one!"],
-    min: [3, "Email is not valide!"],
+    required: true,
+    unique: true,
+    min:true,
   },
   username: {
     type: String,
-    required: [true, "Username is required!"],
-    min: [3, "username is too short"],
-    max: [10, "Username is too long!"],
+    required: true,
+    min: 3,
+    max: 10,
   },
-  posts: [
-    {
+  password : {
+    type : String,
+    required : true,
+  },
+  profileImage : {
+    type : String,
+    default : '/public/uploads/defaultProfile.png'
+  },
+  posts: [{
       type: mongoose.Types.ObjectId,
       ref: "postModel",
-    },
-  ],
-  following: [
-    {
+    }],
+  following: [{
       type: mongoose.Types.ObjectId,
       ref: "userModel",
-    },
-  ],
-  followers: {
-    type: [
-      {
-        type: mongoose.Types.ObjectId,
-        ref: "userModel",
-      },
-    ],
-  },
-});
+    }],
+  followers: [{
+      type: mongoose.Types.ObjectId,
+      ref: "userModel",
+    }],
+},
+{timestamps : true,}
+);
 
 
 module.exports = mongoose.model("userModel", userSchema)
