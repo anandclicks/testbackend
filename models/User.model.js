@@ -22,6 +22,14 @@ const userSchema = new mongoose.Schema({
     type : String,
     required : true,
   },
+  number : {
+    type : Number,
+    required : true
+  },
+  varified : {
+    type : Boolean,
+    default : false
+  },
   profileImage : {
     type : String,
     default : '/public/uploads/defaultProfile.png'

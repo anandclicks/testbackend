@@ -11,11 +11,12 @@ app.use(bodyParser.json());
 app.use('/uploads',express.static(path.join(__dirname, "uploads")))
 
 // Routes handler 
-const userRoutes = require("./Routes/User.route.js")
+const userRoutes = require("./Routes/User.route.js");
+const verifyOtp = require("./helpers/sendOtp.js");
+const getOtp = require("./helpers/generateOtp.js");
 
 //Routes 
 app.use('/v1/users', userRoutes);
-
 
 
 // database connecting and starting sever 

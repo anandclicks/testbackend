@@ -2,11 +2,14 @@ const jsonWenToken = require("jsonwebtoken");
 const bcryptJs = require("bcryptjs");
 
 // user model 
-const UserModel = require("../models/User.model.js")
+const UserModel = require("../models/User.model.js");
+const OTPModel = require("../models/OTP.model.js");
+const getOtp = require("../helpers/generateOtp.js");
+const sendOtp = require("../helpers/sendOtp.js");
 // User registration method 
 const registerUser = async(req,res)=>{
     // extracting form data 
-    const {name,email,username,password,} = req.body
+    const {name,email,number,username,password,} = req.body
     // const {file} = req.file
 
     try {
@@ -20,17 +23,26 @@ const registerUser = async(req,res)=>{
         });
     } else {
         // start user registration process 
-        bcryptJs.genSalt(10,async(salt,error)=>{
-            bcryptJs.hash(password,salt, async(encryptedPassword, error)=>{
+        bcryptJs.genSalt(10,(error,salt)=>{
+            bcryptJs.hash(password,salt, async(rror,encryptedPassword)=>{
                 const createdUser = await UserModel.create({
                     name,
                     email,
                     username,
+                    number,
                     password : encryptedPassword
                 });
+                // verification code sending process 
+                const OTP = getOtp()
+                sendOtp(number, OTP);
+                const otpObj = await OTPModel.create({
+                    otp : OTP,
+                    number : number
+                })
+                // sending response after sending verification code 
                 if(createdUser){
                     res.json({
-                        message : "User has been created!",
+                        message : "Verification has been set to your number!",
                         status : 200,
                         user : createdUser
                     });
@@ -47,7 +59,11 @@ const registerUser = async(req,res)=>{
 };
 
 
-
+// verify phone number by otp function 
+const varifyOtp = (req,res)=> {
+    const {otp} = req.body;
+    
+}
 
 
 
