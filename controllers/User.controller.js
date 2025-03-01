@@ -13,15 +13,6 @@ const registerUser = async(req,res)=>{
     const {name,email,number,username,password,} = req.body
     const {filename} = req?.file
     try {
-    // checking for user existance 
-    const isExist = await UserModel.findOne({email : email});
-    
-    if(isExist){
-        return res.json({
-            message : "User with this email already exist! please use a diffrent one!",
-            status : 409,
-        });
-    } else {
         // start user registration process 
         bcryptJs.genSalt(10,(error,salt)=>{
             bcryptJs.hash(password,salt, async(rror,encryptedPassword)=>{
@@ -55,7 +46,7 @@ const registerUser = async(req,res)=>{
                 }
             });
         });
-    };
+    
     } catch (error) {
        return res.json({
             message : `Internal server error ${error.message}`,

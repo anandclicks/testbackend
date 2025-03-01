@@ -1,5 +1,8 @@
 const multer = require('multer');
 const path = require("path");
+const UserModel = require('../models/User.model');
+
+
 
 const storage = multer.diskStorage({
   destination : function(req,res,cb){
