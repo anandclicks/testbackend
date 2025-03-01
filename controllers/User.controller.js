@@ -6,12 +6,12 @@ const UserModel = require("../models/User.model.js");
 const OTPModel = require("../models/OTP.model.js");
 const getOtp = require("../helpers/generateOtp.js");
 const sendOtp = require("../helpers/sendOtp.js");
+const generateCookie = require("../helpers/generateCookie.js");
 // User registration method 
 const registerUser = async(req,res)=>{
     // extracting form data 
     const {name,email,number,username,password,} = req.body
-    // const {file} = req.file
-
+    const {filename} = req?.file
     try {
     // checking for user existance 
     const isExist = await UserModel.findOne({email : email});
@@ -30,6 +30,7 @@ const registerUser = async(req,res)=>{
                     email,
                     username,
                     number,
+                    profileImage : `${process.env.BASE_URL}/${filename}`,
                     password : encryptedPassword
                 });
                 // verification code sending process 
@@ -39,12 +40,17 @@ const registerUser = async(req,res)=>{
                     otp : OTP,
                     number : number
                 })
+                // sending cookie 
+                const cookie = generateCookie(email);
+                console.log(cookie);
+                res.cookie('token', cookie)
+
                 // sending response after sending verification code 
                 if(createdUser){
-                    res.json({
+                  return res.json({
                         message : "Verification has been set to your number!",
                         status : 200,
-                        user : createdUser
+                        user : await UserModel.findOne({email : createdUser.email}).select('-password')
                     });
                 }
             });
@@ -60,11 +66,56 @@ const registerUser = async(req,res)=>{
 
 
 // verify phone number by otp function 
-const varifyOtp = (req,res)=> {
-    const {otp} = req.body;
+const verifyOtp = async(req,res)=> {
+    const loggedInUser = req.loggedInUser
+    const submittedOTP = req.body.otp
     
+    if(!submittedOTP){
+        return res.json({
+            message : "Otp is required!",
+            status : 403,
+        })
+    };
+
+    if(!loggedInUser) {
+        return res.json({
+            message : "You need to login to verify your Account!",
+            status : 403
+        });
+    };
+
+    // finding user's verifcation OPT from databse 
+    const userVerificationOtp = await OTPModel.findOne({number : loggedInUser.number});
+    console.log(userVerificationOtp);
+    
+    if(!userVerificationOtp){
+        return res.json({
+            message : "Please click on resend otp button!",
+            status : 400
+        });
+    };
+
+    // grabing user's account info and checking otp 
+    console.log(userVerificationOtp.otp);
+    console.log(submittedOTP);
+    
+    
+    if(userVerificationOtp.otp == submittedOTP){
+        const userForVefication = await UserModel.findOne({email : loggedInUser.email}).select('password');
+        userForVefication.varified = true;
+        await userForVefication.save();
+        return res.json({
+            message : "Verification sucessfull!",
+            status : 200
+        });
+    }else {
+        return res.json({
+            message : "OTP is invalide!",
+            status : 403
+        });
+    };
 }
 
 
 
-module.exports = {registerUser};
+module.exports = {registerUser,verifyOtp};
