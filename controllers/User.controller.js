@@ -115,6 +115,36 @@ const verifyOtp = async (req, res) => {
   }
 };
 
+// resend otp method 
+const resendOtp = async(req,res)=> {
+  const {loggedInUser} = req
+  if(!loggedInUser){
+    return res.json({
+      message : "You need to login first!",
+      status : 403
+    });
+  }
+  // removing existing otp if exist
+  const prevOtp = await OTPModel.findOne({number : loggedInUser.number})
+  if(prevOtp){
+    await OTPModel.findOneAndDelete({number : loggedInUser.number})
+  }
+  // send otp 
+  const otp = getOtp(loggedInUser.number)
+  sendOtp(loggedInUser.number, otp)
+ const newOtp = await OTPModel.create({
+    otp : otp,
+    number : loggedInUser.number
+  });
+  console.log(newOtp);
+  
+
+  return res.json({
+    message : 'OTP has sent to your mobile number!',
+    status : 200
+  })
+}
+
 // login method
 const userLogin = (req, res) => {
   const { password, number } = req.body;
@@ -148,4 +178,4 @@ const userLogin = (req, res) => {
 };
 
 // Exporting all methods
-module.exports = { registerUser, verifyOtp, userLogin };
+module.exports = { registerUser, verifyOtp, userLogin,resendOtp };
