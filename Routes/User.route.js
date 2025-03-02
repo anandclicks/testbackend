@@ -1,12 +1,14 @@
 const express = require("express");
 const Router = express.Router();
 
-const {registerUser, verifyOtp} = require("../controllers/User.controller.js");
+const {registerUser, verifyOtp, userLogin} = require("../controllers/User.controller.js");
 const uploadImage = require("../helpers/multer.js");
 const userAuthantication = require('../helpers/userAuthenticate.js');
 const verifingUser = require("../helpers/verifyingUser.js");
+const isVarifiedUser = require("../helpers/isValidedUser.js");
 
 Router.post('/create-user',uploadImage.single('profileImage'),verifingUser, registerUser);
 Router.post('/verify-otp',uploadImage.none(),userAuthantication,verifyOtp);
+Router.post('/user-login',uploadImage.none(),isVarifiedUser,userLogin);
 
 module.exports = Router;

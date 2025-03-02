@@ -9,7 +9,7 @@ const  verifingUser = async(req,res,next)=> {
           {email},
           {number}
       ]});
-      console.log(isExist);
+
       
       if(isExist){
           return res.json({
