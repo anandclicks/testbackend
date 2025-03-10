@@ -146,7 +146,7 @@ const resendOtp = async(req,res)=> {
 }
 
 // login method
-const userLogin = (req, res) => {
+const userLogin = async(req, res) => {
   const { password, number } = req.body;
   const { userForLoginProcess } = req;
   console.log(userForLoginProcess);
@@ -174,6 +174,7 @@ const userLogin = (req, res) => {
   return res.json({
     message: "Loggedin Sucessfully!",
     status: 200,
+    user : await UserModel.findOne({email : userForLoginProcess.email}).select('-password')
   });
 };
 
