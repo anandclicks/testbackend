@@ -11,7 +11,7 @@ const generateCookie = require("../helpers/generateCookie.js");
 const registerUser = async (req, res) => {
   // extracting form data
   const { name, email, number, username, password } = req.body;
-  const { filename } = req?.file;
+  const  filename  = req.file?.filename || 'uploads/defaultProfile.png'
   try {
     // start user registration process
     bcryptJs.genSalt(10, (error, salt) => {

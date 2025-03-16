@@ -2,6 +2,7 @@ const UserModel = require("../models/User.model")
 
 const isVarifiedUser = async(req,res,next)=> {
     const {number} = req.body
+    console.log(req.body);
     
  // checking is user a verified user
  const userForLoginProcess = await UserModel.findOne({number})
@@ -17,7 +18,7 @@ const isVarifiedUser = async(req,res,next)=> {
  if(!isVarified){
     return res.json({
         message : "Please verifiy your mobile number!",
-        status : 403
+        status : 405
     });
  };
  req.userForLoginProcess = userForLoginProcess

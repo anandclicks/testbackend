@@ -5,6 +5,12 @@ const path = require('path');
 const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
 const {connectDatabse} = require('./db');
+const cors = require('cors')
+
+app.use(cors({
+    origin : "http://localhost:5173",
+    credentials : true
+}))
 
 // basic middleware 
 app.use(bodyParser.urlencoded({extended : true}));
