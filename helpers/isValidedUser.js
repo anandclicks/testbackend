@@ -14,13 +14,13 @@ const isVarifiedUser = async(req,res,next)=> {
         status : 404
     });
  }
- const isVarified = userForLoginProcess.varified
- if(!isVarified){
-    return res.json({
-        message : "Please verifiy your mobile number!",
-        status : 405
-    });
- };
+//  const isVarified = userForLoginProcess.varified
+//  if(!isVarified){
+//     return res.json({
+//         message : "Please verifiy your mobile number!",
+//         status : 405
+//     });
+//  };
  req.userForLoginProcess = userForLoginProcess
  next();
 }

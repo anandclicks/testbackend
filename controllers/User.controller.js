@@ -24,16 +24,9 @@ const registerUser = async (req, res) => {
           profileImage: `${process.env.BASE_URL}/${filename}`,
           password: encryptedPassword,
         });
-        // verification code sending process
-        const OTP = getOtp();
-        sendOtp(number, OTP);
-        const otpObj = await OTPModel.create({
-          otp: OTP,
-          number: number,
-        });
+        
         // sending cookie
         const cookie = generateCookie(email);
-        console.log(cookie);
         res.cookie("token", cookie);
 
         // sending response after sending verification code
@@ -56,101 +49,11 @@ const registerUser = async (req, res) => {
   }
 };
 
-// verify phone number by otp function
-const verifyOtp = async (req, res) => {
-  const loggedInUser = req.loggedInUser;
-  const submittedOTP = req.body.otp;
-  try {
-    
-  if (!submittedOTP) {
-    return res.json({
-      message: "Otp is required!",
-      status: 403,
-    });
-  }
-
-  if (!loggedInUser) {
-    return res.json({
-      message: "You need to login to verify your Account!",
-      status: 403,
-    });
-  }
-
-  // finding user's verifcation OPT from databse
-  const userVerificationOtp = await OTPModel.findOne({
-    number: loggedInUser.number,
-  });
-
-  if (!userVerificationOtp) {
-    return res.json({
-      message: "Please click on resend otp button!",
-      status: 400,
-    });
-  }
-
-  // grabbing user's account info and checking otp
-  if (userVerificationOtp.otp == submittedOTP) {
-    const userForVefication = await UserModel.findOne({
-      email: loggedInUser.email,
-    }).select("password");
-    userForVefication.varified = true;
-    await userForVefication.save();
-    // Deleting otp from databse
-    await OTPModel.findOneAndDelete({ number: loggedInUser.number });
-    return res.json({
-      message: "Verification sucessfull!",
-      status: 200,
-    });
-  } else {
-    return res.json({
-      message: "OTP is invalide!",
-      status: 403,
-    });
-  }
-  } catch (error) {
-    return res.json({
-        message : "Something is wrong! try again",
-        message : 500
-    })
-  }
-};
-
-// resend otp method 
-const resendOtp = async(req,res)=> {
-  const {loggedInUser} = req
-  if(!loggedInUser){
-    return res.json({
-      message : "You need to login first!",
-      status : 403
-    });
-  }
-  // removing existing otp if exist
-  const prevOtp = await OTPModel.findOne({number : loggedInUser.number})
-  if(prevOtp){
-    await OTPModel.findOneAndDelete({number : loggedInUser.number})
-  }
-  // send otp 
-  const otp = getOtp(loggedInUser.number)
-  sendOtp(loggedInUser.number, otp)
- const newOtp = await OTPModel.create({
-    otp : otp,
-    number : loggedInUser.number
-  });
-  console.log(newOtp);
-  
-
-  return res.json({
-    message : 'OTP has sent to your mobile number!',
-    status : 200
-  })
-}
 
 // login method
 const userLogin = async(req, res) => {
   const { password, number } = req.body;
-  const { userForLoginProcess } = req;
-  console.log(userForLoginProcess);
-
+  const userForLoginProcess = await UserModel.findOne({number : number})
   if (!password || !number) {
     return res.json({
       message: "Number and password is required!",
@@ -179,4 +82,4 @@ const userLogin = async(req, res) => {
 };
 
 // Exporting all methods
-module.exports = { registerUser, verifyOtp, userLogin,resendOtp };
+module.exports = { registerUser, userLogin };

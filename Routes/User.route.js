@@ -9,9 +9,8 @@ const isVarifiedUser = require("../helpers/isValidedUser.js");
 const { handleFollowUnfollowLogic } = require("../controllers/followUnfollow.controller.js");
 
 Router.post('/register',uploadImage.single('profileImage'),verifingUser, registerUser);
-Router.post('/verify-otp',uploadImage.none(),userAuthantication,verifyOtp);
-Router.post('/login',uploadImage.none(),isVarifiedUser,userLogin);
-Router.post('/resend-otp',uploadImage.none(),userAuthantication,resendOtp);
+Router.post('/login',uploadImage.none(),userLogin);
 Router.post('/follow-unfollow',uploadImage.none(),userAuthantication, handleFollowUnfollowLogic);
+
 
 module.exports = Router;

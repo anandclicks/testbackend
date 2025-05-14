@@ -21,12 +21,14 @@ app.use('/uploads',express.static(path.join(__dirname, "uploads")))
 
 // Routes handler 
 const userRoutes = require("./Routes/User.route.js");
+const postRouter = require("./Routes/Post.route.js")
 const verifyOtp = require("./helpers/sendOtp.js");
 const getOtp = require("./helpers/generateOtp.js");
 const uploadImage = require("./helpers/multer.js");
 
 //Routes 
 app.use('/v1/users', userRoutes);
+app.use('/v1/post/',postRouter)
 
 
 // database connecting and starting sever 
